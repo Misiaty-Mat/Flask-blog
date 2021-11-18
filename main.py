@@ -6,7 +6,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-blog_url = "https://api.npoint.io/c790b4d5cab58020d391"
+blog_url = "https://api.npoint.io/e798406fdfe498afdabe"
 response = requests.get(blog_url)
 blog_posts = response.json()
 
@@ -18,6 +18,14 @@ def home():
 def post_article(post_id):
     post = blog_posts[post_id-1]
     return render_template("post.html", post_data=post)
+
+@app.route('/about')
+def about_page():
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact_page():
+    return render_template('contact.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
