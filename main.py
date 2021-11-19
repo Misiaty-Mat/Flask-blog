@@ -1,10 +1,15 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from dotenv import load_dotenv
 from datetime import datetime
 import requests
+import smtplib
+import os
 
 #loading enviroment
 load_dotenv()
+
+EMAIL_SENDER = os.environ.get("EMAIL_SENDER")
+EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 
 #flask setup
 app = Flask(__name__)
@@ -31,12 +36,30 @@ def post_article(post_id):
 # About page
 @app.route('/about')
 def about_page():
-    return render_template('about.html', year=year)
+    return render_template("about.html", year=year)
 
 # Contact page
-@app.route('/contact')
+@app.route('/contact', methods=["GET", "POST"])
 def contact_page():
-    return render_template('contact.html', year=year)
+    #Getting data from form on contact page
+    if request.method == "POST":
+        form_name = request.form["name"]
+        email = request.form["email"]
+        phone_number = request.form["phone_number"]
+        message = request.form["message"]
+        
+        #Message structure
+        message_to_send = f"Subject:E-mail from {form_name}\n\nMessage from e-mail: {email}\nPhone number: {phone_number}\n Message:\n{message}"
+        
+        #Sending e-mail
+        with smtplib.SMTP("smtp.gmail.com") as connection:
+            connection.starttls()
+            connection.login(user=EMAIL_SENDER, password=EMAIL_PASSWORD)
+            connection.sendmail(from_addr=EMAIL_SENDER, to_addrs="m.a.s.m@wp.pl", msg=message_to_send)
+        return "<h1>Message sended</h1>"
+    else:
+        #Render page
+        return render_template("contact.html", year=year)
 
 # Running app on start
 if __name__ == "__main__":
