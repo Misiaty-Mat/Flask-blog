@@ -5,7 +5,7 @@
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-7">
                     <div class="site-heading">
-                        <h1>Clean Blog</h1>
+                        <h1>Misiaty Blog</h1>
                         <span class="subheading">A Blog Theme by Start Bootstrap</span>
                     </div>
                 </div>
@@ -17,7 +17,7 @@
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">
                 <!-- Post preview-->
-                <!-- Looping through all posts in API and displaying them one by one -->
+                <!-- Looping through all posts in database and displaying them one by one -->
                 {% for blog_post in posts: %}
                     <div class="post-preview">
                         <a href="{{ url_for('post_article', post_id=blog_post.id) }}">
@@ -28,14 +28,19 @@
                             Posted by
                             <a href="#!">{{ blog_post.author }}</a>
                             on {{ blog_post.date }}
+                            <!-- Delete post button -->
+                            <a href="{{ url_for('delete_post', post_id=blog_post.id) }}">✘</a>
                         </p>
                     </div>
                     <!-- Divider-->
                     <hr class="my-4" />
                 {% endfor %}
-                <!-- Pager-->
-                <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="#!">Older Posts →</a></div>
+                <!-- New post button-->
+                <div class="d-flex justify-content-end mb-4">
+                    <a class="btn btn-primary text-uppercase" href="{{ url_for('new_post') }}">Create new post</a>
+                </div>
             </div>
         </div>
     </div>
+    <!-- Footer-->
     {% include "footer.html" %}

@@ -1,7 +1,7 @@
 {% include "header.html" %}
 <!-- Page Header-->
-<!-- Getting correct image from main img folder with API -->
-<header class="masthead" style="background-image: url({{ url_for('static', filename= 'assets/img/' + post_data.image) }})">
+<!-- Getting correct image URL from database-->
+<header class="masthead" style="background-image: url({{ post_data.img_url }})">
     <div class="container position-relative px-4 px-lg-5">
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">
@@ -24,7 +24,11 @@
     <div class="container px-4 px-lg-5">
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">
-                <p>{{ post_data.body }}</p>
+                <!-- Post body -->
+                <p>{{ post_data.body | safe }}</p>
+                <div class="d-flex justify-content-end mb-4">
+                    <a class="btn btn-primary text-uppercase" href="{{ url_for('edit_post', post_id=post_data.id) }}">Edit this post</a>
+                </div>
             </div>
         </div>
     </div>
