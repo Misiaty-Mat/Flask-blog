@@ -3957,6 +3957,10 @@ textarea.form-control-lg {
   width: 100%;
 }
 
+.content p {
+  color: red;
+}
+
 .tab-content > .tab-pane {
   display: none;
 }

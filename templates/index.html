@@ -29,16 +29,20 @@
                             <a href="#!">{{ blog_post.author }}</a>
                             on {{ blog_post.date }}
                             <!-- Delete post button -->
-                            <a href="{{ url_for('delete_post', post_id=blog_post.id) }}">✘</a>
+                            {% if current_user.id in ath_users: %}
+                                <a href="{{ url_for('delete_post', post_id=blog_post.id) }}">✘</a>
+                            {% endif %}
                         </p>
                     </div>
                     <!-- Divider-->
                     <hr class="my-4" />
                 {% endfor %}
                 <!-- New post button-->
+                {% if current_user.id in ath_users: %}
                 <div class="d-flex justify-content-end mb-4">
                     <a class="btn btn-primary text-uppercase" href="{{ url_for('new_post') }}">Create new post</a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

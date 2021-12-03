@@ -1,3 +1,4 @@
+{% import "bootstrap/wtf.html" as wtf %}
 {% include "header.html" %}
 <!-- Page Header-->
 <!-- Getting correct image URL from database-->
@@ -26,12 +27,17 @@
             <div class="col-md-10 col-lg-8 col-xl-7">
                 <!-- Post body -->
                 <p>{{ post_data.body | safe }}</p>
-                <div class="d-flex justify-content-end mb-4">
-                    <a class="btn btn-primary text-uppercase" href="{{ url_for('edit_post', post_id=post_data.id) }}">Edit this post</a>
-                </div>
+                {% if current_user.id in ath_users: %}
+                    <div class="d-flex justify-content-end mb-4">
+                        <a class="btn btn-primary text-uppercase" href="{{ url_for('edit_post', post_id=post_data.id) }}">Edit this post</a>
+                    </div>
+                {% endif %}
+                <hr>
+                {{ wtf.quick_form(form, novalidate=True, button_map={"submit":"primary"}) }}
             </div>
         </div>
     </div>
 </article>
+{{ ckeditor.load() }}
 <!-- Footer-->
 {% include "footer.html" %}
