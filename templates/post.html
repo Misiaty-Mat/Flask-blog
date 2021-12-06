@@ -12,7 +12,7 @@
                     <h2 class="subheading">{{ post_data.subtitle }}</h2>
                     <span class="meta">
                         Posted by
-                        <a href="#!">{{ post_data.author }}</a>
+                        <a href="#!">{{ post_data.author.name }}</a>
                         on {{ post_data.date }} 
                     </span>
                 </div>
@@ -33,7 +33,24 @@
                     </div>
                 {% endif %}
                 <hr>
-                {{ wtf.quick_form(form, novalidate=True, button_map={"submit":"primary"}) }}
+                {% if current_user.is_authenticated: %}
+                    {{ wtf.quick_form(form, novalidate=True, button_map={"submit":"primary"}) }}
+                {% else: %}
+                    <div class="text-uppercase content">
+                        <a href="{{ url_for('login') }}"><p>Log in to post a comment here.</p></a>
+                    </div>
+                {% endif %}
+                <hr>
+                <div class="comment-section">
+                    {% for comment in post_data.child_comments: %}
+                        <div class="comment">
+                            <img class="comment-icon" src="{{ comment.comment_author.name | gravatar }}" alt="Profile icon">
+                            <h3 class="comment-author">{{ comment.comment_author.name }}</h3>
+                            {{ comment.text | safe}}
+                        </div>
+                        <hr>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>

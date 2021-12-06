@@ -26,7 +26,7 @@
                         </a>
                         <p class="post-meta">
                             Posted by
-                            <a href="#!">{{ blog_post.author }}</a>
+                            <a href="#!">{{ blog_post.author.name }}</a>
                             on {{ blog_post.date }}
                             <!-- Delete post button -->
                             {% if current_user.id in ath_users: %}

@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_ckeditor import CKEditor
+from flask_gravatar import Gravatar
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from datetime import datetime
@@ -21,7 +22,11 @@ EMAIL_SENDER = os.environ.get("EMAIL_SENDER")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 
 
-authorizated_users = [1,2,3,4]
+# Getting ids od users with admin premmisions
+authorizated_users = []
+with open("admin_ids.txt") as f:
+    for line in f:
+        authorizated_users.append(int(line.strip()))
 
 # Get current year
 year = datetime.now().year
@@ -39,6 +44,17 @@ db = SQLAlchemy(app)
 
 ckeditor = CKEditor(app)
 
+gravatar = Gravatar(
+    app,
+    size=50,
+    rating='g',
+    default='retro',
+    force_default=False,
+    force_lower=False,
+    use_ssl=False,
+    base_url=None
+    )
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 @login_manager.user_loader
@@ -48,27 +64,43 @@ def load_user(user_id):
 
 ##CONFIGURE USER TABLE IN DATABASE
 class User(UserMixin, db.Model):
-    __tablename__ = "user"
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(250), unique=True, nullable=False)
     password = db.Column(db.String(250), nullable=False)
     name = db.Column(db.String(250), nullable=False)
-    posts = relationship("BlogPost", back_populates="user_relation")
+    
+    posts = relationship("BlogPost", back_populates="author")
+    comments = relationship("Comment", back_populates="comment_author")
 
 
 ##CONFIGURE POST TABLE IN DATABASE
 class BlogPost(db.Model):
-    __tablename__ = "blog_post"
+    __tablename__ = "blog_posts"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(250), unique=True, nullable=False)
     subtitle = db.Column(db.String(250), nullable=False)
     date = db.Column(db.String(250), nullable=False)
     body = db.Column(db.Text, nullable=False)
-    author = db.Column(db.String(250), nullable=False)
     img_url = db.Column(db.String(250), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user_relation = relationship("User", back_populates="posts")
-
+    
+    author = relationship("User", back_populates="posts")
+    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    
+    child_comments = relationship("Comment", back_populates="parent_post")
+    
+##CONFIGURE COMMENT SECTION IN DATABASE
+class Comment(db.Model):
+    __tablename__ = "comments"
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text)
+    
+    
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    comment_author = relationship("User", back_populates="comments")
+    
+    post_id = db.Column(db.Integer, db.ForeignKey("blog_posts.id"))
+    parent_post = relationship("BlogPost", back_populates="child_comments")
     
 
 # Decorator for securing some routes for admin only
@@ -117,12 +149,30 @@ def contact_page():
     
     
 # Individual post page
-@app.route("/post/<int:post_id>")
+@app.route("/post/<int:post_id>", methods=["POST", "GET"])
 def post_article(post_id):
     blog_posts = BlogPost.query.all()
     post = blog_posts[post_id-1]
     
     comment_form = CommentForm()
+    
+    if comment_form.validate_on_submit():
+        new_comment = Comment(
+            text = comment_form.comment.data,
+            
+            comment_author = current_user,
+            parent_post = post
+        )
+        
+        db.session.add(new_comment)
+        db.session.commit()
+        
+        
+        
+        return redirect(url_for("post_article", post_id=post_id))
+    
+    
+    
     return render_template("post.html", post_data=post, year=year, ath_users=authorizated_users, form=comment_form)
     
     
@@ -133,8 +183,6 @@ def post_article(post_id):
 def new_post():
     add_post_form = CreatePost()
     
-    author = current_user.name
-    
     if add_post_form.validate_on_submit():
         current_date = datetime.now().strftime("%B %d, %Y")
         
@@ -143,8 +191,8 @@ def new_post():
             subtitle = add_post_form.subtitle.data,
             date = current_date,
             body = add_post_form.content.data,
-            author = author,
-            img_url = add_post_form.image.data
+            author = current_user,
+            img_url = add_post_form.image.data,
         )
         
         db.session.add(new_post)
