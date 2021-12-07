@@ -34,7 +34,7 @@ class CreatePost(FlaskForm):
 class RegisterForm(FlaskForm):
     email = StringField(
         label = "Email",
-        validators=[DataRequired(), Email(), Length(max=100)]
+        validators=[DataRequired(), Email(), Length(max=100)],
     )
     
     password = PasswordField(
