@@ -89,6 +89,7 @@ class BlogPost(db.Model):
     
     child_comments = relationship("Comment", back_populates="parent_post")
     
+    
 ##CONFIGURE COMMENT SECTION IN DATABASE
 class Comment(db.Model):
     __tablename__ = "comments"
