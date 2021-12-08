@@ -215,7 +215,6 @@ def edit_post(post_id):
         title=post_data.title,
         subtitle=post_data.subtitle,
         image=post_data.img_url,
-        name=post_data.author,
         content=post_data.body
     )
     
@@ -223,7 +222,7 @@ def edit_post(post_id):
         post_data.title = edit_post_form.title.data
         post_data.subtitle = edit_post_form.subtitle.data
         post_data.body = edit_post_form.content.data
-        post_data.author = edit_post_form.name.data
+        post_data.author = current_user
         post_data.img_url = edit_post_form.image.data
         
         db.session.commit()
