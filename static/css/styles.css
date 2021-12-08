@@ -11266,3 +11266,7 @@ header.masthead .site-heading .h1 {
 .form-group > label {
   margin-top: 1rem;
 }
+
+.help-block {
+  color: red;
+}
