@@ -7,7 +7,6 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 from flask_ckeditor import CKEditor
 from flask_gravatar import Gravatar
 from werkzeug.security import generate_password_hash, check_password_hash
-from dotenv import load_dotenv
 from datetime import datetime
 
 
