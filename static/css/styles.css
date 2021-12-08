@@ -11270,3 +11270,7 @@ header.masthead .site-heading .h1 {
 .help-block {
   color: red;
 }
+
+.pre {
+  text-overflow: auto;
+}
