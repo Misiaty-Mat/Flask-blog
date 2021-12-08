@@ -9,18 +9,10 @@ from flask_gravatar import Gravatar
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from datetime import datetime
-import smtplib
-import os
+
 
 # Local filel
 from forms import CreatePost, RegisterForm, LoginForm, CommentForm
-
-#loading enviroment
-load_dotenv()
-
-EMAIL_SENDER = os.environ.get("EMAIL_SENDER")
-EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
-
 
 # Getting ids od users with admin premmisions
 authorizated_users = []
@@ -142,11 +134,7 @@ def contact_page():
         message_to_send = f"Subject:E-mail from {form_name}\n\nMessage from e-mail: {email}\nPhone number: {phone_number}\n Message:\n{message}"
         
         #Sending e-mail
-        with smtplib.SMTP("smtp.gmail.com") as connection:
-            connection.starttls()
-            connection.login(user=EMAIL_SENDER, password=EMAIL_PASSWORD)
-            connection.sendmail(from_addr=EMAIL_SENDER, to_addrs="m.a.s.m@wp.pl", msg=message_to_send)
-        return "<h1>Message sended</h1>"
+        
     else:
         #Render page
         return render_template("contact.html", year=year)
