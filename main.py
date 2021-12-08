@@ -8,10 +8,17 @@ from flask_ckeditor import CKEditor
 from flask_gravatar import Gravatar
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+import smtplib
+import os
 
 
 # Local filel
 from forms import CreatePost, RegisterForm, LoginForm, CommentForm
+
+
+EMAIL_SENDER = os.environ.get("EMAIL_SENDER")
+EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
+
 
 # Getting ids od users with admin premmisions
 authorizated_users = []
@@ -22,14 +29,14 @@ with open("admin_ids.txt") as f:
 # Get current year
 year = datetime.now().year
 
-
 #flask setup
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "random gibblerish"
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
+
 Bootstrap(app)
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///blog.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -130,7 +137,11 @@ def contact_page():
         message_to_send = f"Subject:E-mail from {form_name}\n\nMessage from e-mail: {email}\nPhone number: {phone_number}\n Message:\n{message}"
         
         #Sending e-mail
-        
+        with smtplib.SMTP("smtp.gmail.com") as connection:
+            connection.starttls()
+            connection.login(user=EMAIL_SENDER, password=EMAIL_PASSWORD)
+            connection.sendmail(from_addr=EMAIL_SENDER, to_addrs="m.a.s.m@wp.pl", msg=message_to_send)
+        return "<h1>Message sended</h1>"
     else:
         #Render page
         return render_template("contact.html", year=year)
