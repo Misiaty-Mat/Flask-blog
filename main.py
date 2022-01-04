@@ -31,7 +31,7 @@ year = datetime.now().year
 
 #flask setup
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.urandom(32)
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 
 Bootstrap(app)
 
@@ -145,7 +145,6 @@ def contact_page():
             connection.sendmail(from_addr=EMAIL_SENDER, to_addrs="mateuszmis06@gmail.com", msg=message_to_send)
         return "<h1>Message sended</h1>"
     else:
-        #Render page
         return render_template("contact.html", year=year)
     
     
